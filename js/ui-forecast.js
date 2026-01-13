@@ -1,25 +1,46 @@
-export function renderForecastView() {
+import { computePeakRisk } from './logic-forecast.js';
+import { fetchGridData } from './api.js';
+
+export async function renderForecastView() {
   const timeline = document.querySelector('#forecast-timeline');
   const summary = document.querySelector('#forecast-summary');
   if (!timeline || !summary) return;
-  const now = new Date();
-  const hours = Array.from({ length: 12 }, (_, i) => new Date(now.getTime() + i * 60 * 60 * 1000));
-  const peakWindowStartIdx = 5;
-  const peakWindowEndIdx = 7;
-  timeline.innerHTML = '';
-  hours.forEach((d, idx) => {
-    let level = 'low';
-    if (idx >= peakWindowStartIdx && idx <= peakWindowEndIdx) level = 'high';
-    else if (idx >= 3 && idx <= 4) level = 'medium';
-    const label = d.toTimeString().slice(0, 5);
-    const div = document.createElement('div');
-    div.className = `forecast-slot ${level}`;
-    div.innerHTML = `<div>${label}</div><div style="margin-top:2px;text-transform:uppercase;font-size:0.65rem;">${level}</div>`;
-    timeline.appendChild(div);
-  });
-  const start = hours[peakWindowStartIdx].toTimeString().slice(0, 5);
-  const end = hours[peakWindowEndIdx].toTimeString().slice(0, 5);
-  summary.textContent = `High peak risk expected between ${start}–${end} due to falling solar output and rising evening demand.`;
+
+  try {
+    const gridData = await fetchGridData();
+    const forecastResult = computePeakRisk(gridData);
+
+    // Render risk bars
+    timeline.innerHTML = '';
+    forecastResult.hourly.forEach((hour) => {
+      const bar = document.createElement('div');
+      bar.className = `forecast-slot ${hour.level.toLowerCase()}`;
+      
+      const riskPercent = Math.round(hour.score * 100);
+      bar.innerHTML = `
+        <div style="font-size:0.65rem;font-weight:600;">${hour.hour}:00</div>
+        <div style="height:24px;background:rgba(255,255,255,0.1);border-radius:3px;margin:2px 0;position:relative;">
+          <div style="height:100%;width:${riskPercent}%;background:${hour.level === 'HIGH' ? '#ff5555' : hour.level === 'MEDIUM' ? '#ffb86c' : '#50fa7b'};border-radius:3px;transition:all 0.2s;"></div>
+        </div>
+        <div style="font-size:0.6rem;text-transform:uppercase;color:#999;">${hour.level}</div>
+      `;
+      timeline.appendChild(bar);
+    });
+
+    // Render summary
+    summary.textContent = forecastResult.summary;
+  } catch (err) {
+    console.warn('Forecast render failed', err);
+    summary.textContent = 'Unable to load forecast data.';
+  }
+}
+
+export async function initForecastView() {
+  renderForecastView();
   const btnPlan = document.querySelector('#btn-plan-dr');
-  if (btnPlan) btnPlan.addEventListener('click', () => alert('In final version, will pre-fill DR event for peak window.'));
+  if (btnPlan) {
+    btnPlan.addEventListener('click', () => {
+      alert('Peak window identified. Use the DR Console to simulate event response.');
+    });
+  }
 }
