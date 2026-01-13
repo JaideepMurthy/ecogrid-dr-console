@@ -3,6 +3,7 @@ import { fetchGridData } from './api.js';
 import { renderGridOverview } from './ui-grid.js';
 import { renderForecastView } from './ui-forecast.js';
 import { initDrConsole } from './ui-events.js';
+import { renderHistoryView } from './ui-history.js';
 
 window.addEventListener('DOMContentLoaded', async () => {
   try {
@@ -15,6 +16,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     renderGridOverview(sample);
     renderForecastView();
     initDrConsole();
+        renderHistoryView();
   } catch (err) {
     console.error('App init error', err);
     const el = document.querySelector('#grid-kpis');
