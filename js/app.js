@@ -1,5 +1,5 @@
 import { initDb } from './db.js';
-import { fetchSampleGridData } from './api.js';
+import { fetchGridData } from './api.js';
 import { renderGridOverview } from './ui-grid.js';
 import { renderForecastView } from './ui-forecast.js';
 import { initDrConsole } from './ui-events.js';
@@ -9,7 +9,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     await initDb();
     console.info('IndexedDB initialised');
 
-    const sample = await fetchSampleGridData();
+    const sample = await fetchGridData();
     console.info('Sample grid data:', sample);
 
     renderGridOverview(sample);
