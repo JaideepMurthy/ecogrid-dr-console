@@ -46,7 +46,8 @@
       <form id="dr-form" class="dr-form">
         <label>Target reduction (MW) <input type="number" id="dr-target-mw" required min="10" step="10" /></label>
         <label>Start time (local) <input type="datetime-local" id="dr-start-time" required /></label>
-        <label>Duration (hours) <input type="number" id="          <label>Ramping Profile (min to full reduction): <input type="range" id="dr-ramp-min" min="5" max="30" value="10" step="5" style="vertical-align:middle;"> <span id="ramp-display">10 min</span></label>-hours" required min="0.5" step="0.5" /></label>
+<label>Duration (hours) <input type="number" id="dr-duration-hours" required min="0.5" step="0.5" /></label>
+                  <label style="margin-top: 15px;">Ramping Profile (min to reach full reduction): <input type="range" id="dr-ramp-min" min="5" max="30" value="10" step="5" /><span id="ramp-display">10 min</span></label>
         <fieldset>
           <legend>Segments (share of flexible load)</legend>
           <label>Industrial & Commercial HVAC (%) <input type="number" id="seg-industrial" value="40" min="0" max="100" /></label>
@@ -81,5 +82,10 @@
 
   <footer class="app-footer"><span>EcoGrid DR Console - TecStorm Demo</span></footer>
   <script type="module" src="js/app.js"></script>
+  <script>
+  document.getElementById('dr-ramp-min')?.addEventListener('input', (e) => {
+    document.getElementById('ramp-display').textContent = e.target.value + ' min';
+  });
+</script>
 </body>
 </html>
