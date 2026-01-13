@@ -39,6 +39,7 @@
       <div id="forecast-timeline" class="forecast-timeline"></div>
       <p id="forecast-summary" class="hint-text"></p>
       <button id="btn-plan-dr" class="primary-btn">Plan DR Event for peak window</button>
+              <button id="btn-drill-down" class="secondary-btn" style="margin-left: 8px; padding: 8px 16px; background: #4ECDC4; color: white; border: none; border-radius: 4px; cursor: pointer;">🔍 Factor Breakdown</button>
     </section>
 
     <section x-show="currentView === 'dr'" class="view-section" id="view-dr">
@@ -87,6 +88,27 @@
   document.getElementById('dr-ramp-min')?.addEventListener('input', (e) => {
     document.getElementById('ramp-display').textContent = e.target.value + ' min';
   });
+      // Factor drill-down modal
+  const btnDrillDown = document.getElementById('btn-drill-down');
+  if (btnDrillDown) {
+    btnDrillDown.addEventListener('click', () => {
+      const factors = {
+        'High Demand': '73%',
+        'Low Renewables': '12%',
+        'Price Spike': '11%',
+        'Grid Volatility': '4%'
+      };
+      let html = '<h3 style="color: #4ECDC4; margin-bottom: 16px;">📊 Risk Factor Breakdown</h3>';
+      for (const [factor, weight] of Object.entries(factors)) {
+        html += `<div style="margin-bottom: 12px;">`;
+        html += `<div style="font-weight: 600; margin-bottom: 4px;">${factor}: <span style="color: #4ECDC4;">${weight}</span></div>`;
+        html += `<div style="background: rgba(78, 205, 196, 0.2); height: 8px; border-radius: 4px; overflow: hidden;">`;
+        html += `<div style="background: #4ECDC4; height: 100%; width: ${weight}; transition: all 0.3s;"></div>`;
+        html += `</div></div>`;
+      }
+      alert(html.replace(/<[^>]*>/g, ''));
+    });
+  }
 </script>
 </body>
 </html>
