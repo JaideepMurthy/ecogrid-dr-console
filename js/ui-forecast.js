@@ -8,7 +8,9 @@ export async function renderForecastView() {
 
   try {
     const gridData = await fetchGridData();
-    const forecastResult = computePeakRisk(gridData);
+     // Normalize grid data structure for forecast algorithm
+ const normalizedData = normalizeGridData(gridData);
+     const forecastResult = computePeakRisk(normalizedData);
 
     // Render risk bars
     timeline.innerHTML = '';
@@ -41,6 +43,28 @@ export async function initForecastView() {
   if (btnPlan) {
     btnPlan.addEventListener('click', () => {
       alert('Peak window identified. Use the DR Console to simulate event response.');
+
+      // Helper function to normalize API data structure to match forecast algorithm expectations
+function normalizeGridData(gridData) {
+ if (!gridData || !gridData.hourly) return gridData;
+ 
+ return {
+ ...gridData,
+ hourly: gridData.hourly.map((h, idx) => ({
+ hour: idx,
+ hourIndex: idx,
+ timestamp: h.timestamp,
+ demandMW: h.demandMW,
+ supplyMW: h.supplyMW,
+ priceMWh: h.priceMWh,
+ solarMW: h.production?.solarMW || 0,
+ windMW: h.production?.windMW || 0,
+ hydroMW: h.production?.hydroMW || 0,
+ gasMW: h.production?.gasMW || 0,
+ importsMW: h.production?.importsMW || 0
+ }))
+ };
+}
     });
   }
 }
