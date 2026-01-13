@@ -14,8 +14,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     console.info('Sample grid data:', sample);
 
     renderGridOverview(sample);
-    renderForecastView();
-    initDrConsole();
+await renderForecastView();   
+     initDrConsole();
     await renderHistoryView(); // Ensure it's awaited
   } catch (err) {
     console.error('App init error', err);
