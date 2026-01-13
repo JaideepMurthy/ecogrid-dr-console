@@ -196,4 +196,30 @@ export async function renderHistoryView() {
       }
     });
   }
+
+
+// Export events to CSV with audit trail
+export function exportEventsToCSV() {
+  listDrEvents().then(events => {
+    const headers = ['Timestamp', 'Operator', 'Target MW', 'Achieved MW', 'Duration (h)', 'Cost (€)', 'CO₂ (t)'];
+    const rows = events.map(e => [
+      new Date(e.createdAt).toISOString(),
+      e.operatorName || 'Unknown',
+      e.targetMw || '-',
+      (e.achievedMw || 0).toFixed(1),
+      e.durationH || '-',
+      (e.costSavedEur || 0).toLocaleString(),
+      (e.co2AvoidedTons || 0).toFixed(1)
+    ]);
+    
+    const csv = [headers, ...rows].map(row => row.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `ecogrid_events_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+  });
+}
 }
