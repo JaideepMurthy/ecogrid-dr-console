@@ -1,10 +1,14 @@
 import { loadGridResponse, saveGridResponse } from './db.js';
 
+// REN Data Hub API configuration
 const REN_API_BASE = 'https://datahub.ren.pt/api/v1';
-const GRID_TTL_MS = 30 * 60 * 1000; // 30-minute cache
+const CORS_PROXY = 'https://cors-anywhere.herokuapp.com/'; // Fallback CORS proxy
+const GRID_TTL_MS = 30 * 60 * 1000; // 30-minute cache for REN data
 const SYNTHETIC_TTL_MS = 5 * 60 * 1000; // 5-minute cache for synthetic fallback
 
-// Attempt to fetch REAL data from REN Data Hub, with intelligent fallback
+let currentDataSource = 'unknown'; // Track data source for badge
+
+// Attempt to fetch REAL data from REN Data Hub with intelligent fallback
 async function fetchRealRENData() {
   const cacheKey = 'ren_grid_data';
   const cached = await loadGridResponse(cacheKey);
@@ -12,50 +16,99 @@ async function fetchRealRENData() {
   // Check cache freshness
   if (cached && (Date.now() - cached.timestamp < GRID_TTL_MS)) {
     console.log('[API] ✓ Using cached REN data from', new Date(cached.timestamp).toLocaleString());
+    currentDataSource = cached.source || 'REN Data Hub (cached)';
+    updateDataSourceBadge(true);
     return cached.data;
   }
+  
+  // Try direct REN API first
+  let realData = await tryDirectRENAPI();
+  
+  // If direct API fails, try with CORS proxy
+  if (!realData) {
+    realData = await tryRENAPIWithProxy();
+  }
+  
+  // If both fail, fall back to synthetic data
+  if (!realData) {
+    console.warn('[API] ⚠ REN API unavailable, falling back to synthetic data');
+    currentDataSource = 'Synthetic Demo Data';
+    updateDataSourceBadge(false);
+    return generatePTGridData();
+  }
+  
+  // Cache the real data
+  await saveGridResponse(cacheKey, { ...realData, source: 'REN Data Hub (live)' });
+  currentDataSource = 'REN Data Hub (live)';
+  updateDataSourceBadge(true);
+  
+  return realData;
+}
 
+// Try direct REN API without CORS proxy
+async function tryDirectRENAPI() {
   try {
-    console.log('[API] Attempting to fetch real REN data...');
+    console.log('[API] Attempting direct REN Data Hub API...');
     
-    // Fetch all three endpoints in parallel
-    const [consumptionRes, productionRes, pricesRes] = await Promise.all([
-      fetch(`${REN_API_BASE}/electricity-consumption-supply-daily`, { timeout: 5000 }),
-      fetch(`${REN_API_BASE}/electricity-production-breakdown-daily`, { timeout: 5000 }),
-      fetch(`${REN_API_BASE}/electricity-market-prices-daily`, { timeout: 5000 })
+    // Fetch all three endpoints in parallel with timeout
+    const [consumptionRes, productionRes, pricesRes] = await Promise.race([
+      Promise.all([
+        fetch(`${REN_API_BASE}/electricity-consumption-supply-daily`),
+        fetch(`${REN_API_BASE}/electricity-production-breakdown-daily`),
+        fetch(`${REN_API_BASE}/electricity-market-prices-daily`)
+      ]),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('API timeout')), 8000))
     ]);
-
+    
     // Handle HTTP errors
     if (!consumptionRes.ok || !productionRes.ok || !pricesRes.ok) {
-      console.warn('[API] ⚠ REN API returned non-200 status, falling back to synthetic');
-      return generatePTGridData();
+      console.warn('[API] ⚠ REN API returned non-200 status');
+      return null;
     }
-
+    
     const consumption = await consumptionRes.json();
     const production = await productionRes.json();
     const prices = await pricesRes.json();
-
+    
     console.log('[API] ✓ Successfully fetched real REN data');
-    console.log('[API] Consumption data:', consumption);
-    console.log('[API] Production data:', production);
-    console.log('[API] Prices data:', prices);
-
+    
     // Transform REN format to our grid format
-    const transformed = transformRENToGridData(consumption, production, prices);
-    
-    // Cache the result
-    await saveGridResponse(cacheKey, transformed);
-    
-    // Update UI badge
-    updateDataSourceBadge(true);
-    
-    return transformed;
-
+    return transformRENToGridData(consumption, production, prices);
   } catch (error) {
-    console.warn('[API] ⚠ REN API fetch failed:', error.message);
-    console.warn('[API] Falling back to synthetic cached/generated data');
-    updateDataSourceBadge(false);
-    return generatePTGridData();
+    console.warn('[API] Direct REN API failed:', error.message);
+    return null;
+  }
+}
+
+// Try REN API with CORS proxy (for local development)
+async function tryRENAPIWithProxy() {
+  try {
+    console.log('[API] Attempting REN API with CORS proxy...');
+    
+    const [consumptionRes, productionRes, pricesRes] = await Promise.race([
+      Promise.all([
+        fetch(`${CORS_PROXY}${REN_API_BASE}/electricity-consumption-supply-daily`),
+        fetch(`${CORS_PROXY}${REN_API_BASE}/electricity-production-breakdown-daily`),
+        fetch(`${CORS_PROXY}${REN_API_BASE}/electricity-market-prices-daily`)
+      ]),
+      new Promise((_, reject) => setTimeout(() => reject(new Error('Proxy timeout')), 8000))
+    ]);
+    
+    if (!consumptionRes.ok || !productionRes.ok || !pricesRes.ok) {
+      console.warn('[API] ⚠ CORS proxy returned non-200 status');
+      return null;
+    }
+    
+    const consumption = await consumptionRes.json();
+    const production = await productionRes.json();
+    const prices = await pricesRes.json();
+    
+    console.log('[API] ✓ Successfully fetched REN data via CORS proxy');
+    
+    return transformRENToGridData(consumption, production, prices);
+  } catch (error) {
+    console.warn('[API] CORS proxy failed:', error.message);
+    return null;
   }
 }
 
@@ -73,7 +126,7 @@ function transformRENToGridData(consumption, production, prices) {
   if (!Array.isArray(consumptionData)) consumptionData = [consumptionData];
   if (!Array.isArray(productionData)) productionData = [productionData];
   if (!Array.isArray(pricesData)) pricesData = [pricesData];
-
+  
   // If REN returns daily data, we'll interpolate hourly
   const baseConsumption = consumptionData[0]?.consumption || 4200;
   const baseSupply = consumptionData[0]?.supply || 4350;
@@ -83,7 +136,7 @@ function transformRENToGridData(consumption, production, prices) {
   const baseHydro = productionData[0]?.hydro || 650;
   const baseGas = productionData[0]?.gas || 450;
   const baseImports = productionData[0]?.imports || 200;
-
+  
   // Generate 24-hour forecast from daily data
   for (let i = 0; i < 24; i++) {
     const sine = Math.sin((Math.PI * i) / 24);
@@ -96,7 +149,7 @@ function transformRENToGridData(consumption, production, prices) {
     const hydro = baseHydro;
     const gas = Math.round(demand * 0.3);
     const imports = Math.round(demand * 0.1);
-
+    
     hours.push({
       timestamp: hour.toISOString(),
       demandMW: Math.round(demand),
@@ -111,10 +164,10 @@ function transformRENToGridData(consumption, production, prices) {
       }
     });
   }
-
+  
   const totalRenewables = baseSolar + baseWind + baseHydro;
   const totalProduction = totalRenewables + baseGas + baseImports;
-
+  
   return {
     timestamp: now.toISOString(),
     region: 'Portugal (Mainland)',
@@ -139,7 +192,7 @@ function generatePTGridData() {
   const hours = [];
   const baseLoad = 4200;
   const variation = 600;
-
+  
   for (let i = 0; i < 24; i++) {
     const sine = Math.sin((Math.PI * i) / 24);
     const demand = baseLoad + variation * sine;
@@ -159,7 +212,7 @@ function generatePTGridData() {
       }
     });
   }
-
+  
   return {
     timestamp: now.toISOString(),
     region: 'Portugal (Mainland)',
@@ -183,13 +236,18 @@ function updateDataSourceBadge(isRealData) {
   const badge = document.getElementById('dataSourceLabel');
   if (badge) {
     if (isRealData) {
-      badge.textContent = '🟢 Live: REN Data Hub';
-      badge.parentElement.style.background = '#2ecc71';
+      badge.textContent = '🟢 Live: REN Data Hub API';
+      badge.style.background = '#2ecc71';
     } else {
       badge.textContent = '🟡 Demo: Synthetic Data';
-      badge.parentElement.style.background = '#f39c12';
+      badge.style.background = '#f39c12';
     }
   }
+}
+
+// Export current data source for display
+export function getDataSource() {
+  return currentDataSource;
 }
 
 // Main export: Use real API with fallback
@@ -197,7 +255,7 @@ export async function fetchGridData() {
   return await fetchRealRENData();
 }
 
-// Parse functions (kept for backwards compatibility)
+// Backwards compatibility exports (kept for legacy code)
 export async function getDailyBalance(dateStr) {
   console.debug('getDailyBalance:', dateStr);
   return null;
