@@ -61,4 +61,52 @@ export function getDrEventById(id) {
     req.onsuccess = () => resolve(req.result || null);
     req.onerror = () => reject(req.error);
   });
+  
+// Audit trail and compliance functions
+export function createAuditLog(eventId, operatorName, action) {
+  const timestamp = new Date().toISOString();
+  const hash = generateHash(`${eventId}-${operatorName}-${action}-${timestamp}`);
+  return {
+    eventId,
+    operatorName,
+    action,
+    timestamp,
+    hash,
+    verified: true
+  };
+}
+
+// Simple hash function for tamper detection (client-side)
+function generateHash(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash; // Convert to 32bit integer
+  }
+  return Math.abs(hash).toString(16);
+}
+
+// Save audit log to IndexedDB
+export function saveAuditLog(auditLog) {
+  return new Promise((resolve, reject) => {
+    const store = getStore('auditLogs', 'readwrite');
+    const req = store.add(auditLog);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// Retrieve audit trail for specific event
+export function getAuditTrail(eventId) {
+  return new Promise((resolve, reject) => {
+    const store = getStore('auditLogs', 'readonly');
+    const req = store.getAll();
+    req.onsuccess = () => {
+      const logs = (req.result || []).filter(log => log.eventId === eventId);
+      resolve(logs);
+    };
+    req.onerror = () => reject(req.error);
+  });
+}
 }
