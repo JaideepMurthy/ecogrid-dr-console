@@ -44,6 +44,7 @@
     <section x-show="currentView === 'dr'" class="view-section" id="view-dr">
       <h1>DR Event Console</h1>
       <form id="dr-form" class="dr-form">
+                  <label style="margin-bottom: 15px;">Operator Name <input type="text" id="operator-name" placeholder="Your name (for audit trail)" style="width:100%; padding:8px;" /></label>
         <label>Target reduction (MW) <input type="number" id="dr-target-mw" required min="10" step="10" /></label>
         <label>Start time (local) <input type="datetime-local" id="dr-start-time" required /></label>
 <label>Duration (hours) <input type="number" id="dr-duration-hours" required min="0.5" step="0.5" /></label>
