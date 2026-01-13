@@ -1,0 +1,25 @@
+import { initDb } from './db.js';
+import { fetchSampleGridData } from './api.js';
+import { renderGridOverview } from './ui-grid.js';
+import { renderForecastView } from './ui-forecast.js';
+import { initDrConsole } from './ui-events.js';
+
+window.addEventListener('DOMContentLoaded', async () => {
+  try {
+    await initDb();
+    console.info('IndexedDB initialised');
+
+    const sample = await fetchSampleGridData();
+    console.info('Sample grid data:', sample);
+
+    renderGridOverview(sample);
+    renderForecastView();
+    initDrConsole();
+  } catch (err) {
+    console.error('App init error', err);
+    const el = document.querySelector('#grid-kpis');
+    if (el) {
+      el.innerHTML = '<div class="kpi-card"><div class="kpi-label">Status</div><div class="kpi-value">Demo mode</div><div class="kpi-sub">Live grid API unavailable</div></div>';
+    }
+  }
+});
