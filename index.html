@@ -5,6 +5,7 @@
   <title>EcoGrid DR Console</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
@@ -21,11 +22,14 @@
 
   <main class="app-main">
     <section x-show="currentView === 'grid'" class="view-section" id="view-grid">
-      <h1>Grid Overview</h1>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <h1>Grid Overview</h1>
+        <div id="dataSourceLabel" style="background: #f39c12; padding: 6px 12px; border-radius: 4px; font-size: 0.85em; color: #fff; font-weight: bold;">🟡 Demo: Synthetic Data</div>
+      </div>
       <div id="grid-kpis" class="kpi-row"></div>
       <div class="chart-container"><canvas id="chart-demand-supply"></canvas></div>
       <div class="chart-container"><canvas id="chart-price"></canvas></div>
-            <div class="chart-container"><canvas id="chart-production-mix"></canvas></div>
+      <div class="chart-container"><canvas id="chart-production-mix"></canvas></div>
       <button id="btn-refresh-grid" class="primary-btn">Refresh data</button>
       <p class="hint-text">Uses public Portugal electricity data, cached locally for fast demos.</p>
     </section>
