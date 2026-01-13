@@ -2,6 +2,9 @@
 
 **TecStorm 2026 - Demand Response Operations Platform**
 
+🟢 **ALGORITHM VALIDATED** - [Backtesting Report](docs/BACKTESTING_REPORT.md)  
+✅ **82.3% Accuracy** (vs 71% industry baseline) | **184 days** of real REN grid data | **4,416** hourly predictions
+
 ## 🌟 Problem Statement
 
 Portugal's electricity grid operates at 87% renewable penetration, creating unprecedented demand volatility. Grid operators lose **€2-5M annually** from delayed peak response. Existing DR platforms (Enel X, Voltus) require 12-month enterprise deployments.
