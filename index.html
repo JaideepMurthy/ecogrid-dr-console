@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>EcoGrid DR Console</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="css/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body x-data="{ currentView: 'grid' }" class="app-body">
+  <header class="app-header">
+    <div class="app-title">EcoGrid DR Console</div>
+    <nav class="app-nav">
+      <button :class="{'active': currentView === 'grid'}" @click="currentView = 'grid'">Grid Overview</button>
+      <button :class="{'active': currentView === 'forecast'}" @click="currentView = 'forecast'">Peak Forecast</button>
+      <button :class="{'active': currentView === 'dr'}" @click="currentView = 'dr'">DR Console</button>
+      <button :class="{'active': currentView === 'history'}" @click="currentView = 'history'">Event History</button>
+    </nav>
+  </header>
+
+  <main class="app-main">
+    <section x-show="currentView === 'grid'" class="view-section" id="view-grid">
+      <h1>Grid Overview</h1>
+      <div id="grid-kpis" class="kpi-row"></div>
+      <div class="chart-container"><canvas id="chart-demand-supply"></canvas></div>
+      <div class="chart-container"><canvas id="chart-price"></canvas></div>
+      <button id="btn-refresh-grid" class="primary-btn">Refresh data</button>
+      <p class="hint-text">Uses public Portugal electricity data, cached locally for fast demos.</p>
+    </section>
+
+    <section x-show="currentView === 'forecast'" class="view-section" id="view-forecast">
+      <h1>Peak Risk Forecast</h1>
+      <div id="forecast-timeline" class="forecast-timeline"></div>
+      <p id="forecast-summary" class="hint-text"></p>
+      <button id="btn-plan-dr" class="primary-btn">Plan DR Event for peak window</button>
+    </section>
+
+    <section x-show="currentView === 'dr'" class="view-section" id="view-dr">
+      <h1>DR Event Console</h1>
+      <form id="dr-form" class="dr-form">
+        <label>Target reduction (MW) <input type="number" id="dr-target-mw" required min="10" step="10" /></label>
+        <label>Start time (local) <input type="datetime-local" id="dr-start-time" required /></label>
+        <label>Duration (hours) <input type="number" id="dr-duration-hours" required min="0.5" step="0.5" /></label>
+        <fieldset>
+          <legend>Segments (share of flexible load)</legend>
+          <label>Industrial & Commercial HVAC (%) <input type="number" id="seg-industrial" value="40" min="0" max="100" /></label>
+          <label>EV charging fleets (%) <input type="number" id="seg-ev" value="35" min="0" max="100" /></label>
+          <label>Commercial refrigeration (%) <input type="number" id="seg-commercial" value="25" min="0" max="100" /></label>
+        </fieldset>
+        <button type="submit" class="primary-btn">Simulate DR Event</button>
+      </form>
+      <section id="dr-result" class="dr-result"></section>
+    </section>
+
+    <section x-show="currentView === 'history'" class="view-section" id="view-history">
+      <h1>Event History & ROI</h1>
+      <div id="history-aggregates" class="kpi-row"></div>
+      <div class="chart-container"><canvas id="chart-history-mw"></canvas></div>
+      <div class="chart-container"><canvas id="chart-history-cost"></canvas></div>
+      <table id="history-table" class="history-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Target MW</th>
+            <th>Achieved MW</th>
+            <th>Duration (h)</th>
+            <th>EUR Saved</th>
+            <th>CO2 Avoided (t)</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+  </main>
+
+  <footer class="app-footer"><span>EcoGrid DR Console - TecStorm Demo</span></footer>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
