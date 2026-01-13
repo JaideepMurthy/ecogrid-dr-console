@@ -1,4 +1,5 @@
 import { createDrEvent, listDrEvents } from './db.js';
+import { renderHistoryView } from './ui-history.js';
 
 export function initDrConsole() {
   const form = document.querySelector('#dr-form');
@@ -15,6 +16,7 @@ export function initDrConsole() {
     const fakeCo2 = fakeAchieved * durationH * 0.45;
     const eventDoc = { createdAt: new Date().toISOString(), targetMw, achievedMw: fakeAchieved, durationH, costSavedEur: fakeCost, co2AvoidedTons: fakeCo2, startTime };
     const id = await createDrEvent(eventDoc);
+     renderHistoryView(); // Update Event History tab after creating event
     resultContainer.innerHTML = `
       <div class="dr-summary-card">
         <h2 style="margin:0 0 0.4rem;font-size:1rem;">Simulated DR Event #${id}</h2>
