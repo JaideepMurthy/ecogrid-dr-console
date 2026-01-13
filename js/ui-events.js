@@ -9,7 +9,9 @@ export function initDrConsole() {
     e.preventDefault();
     const targetMw = Number(document.querySelector('#dr-target-mw').value || 0);
     const startTime = document.querySelector('#dr-start-time').value;
-    const durationH = Number(document.querySelector('#dr-duration-hours').value || 0);
+    const fakeAchieved = targetMw * 0.9;  const rampMin = Number(document.querySelector('#dr-ramp-min')?.value || 10);
+  const rampingFactor = Math.min(1, (durationH * 60) / rampMin);
+  const fakeAchieved = targetMw * 0.9 * rampingFactor;const durationH = Number(document.querySelector('#dr-duration-hours').value || 0);
     if (!targetMw || !startTime || !durationH) { alert('Please fill all DR event fields.'); return; }
     const fakeAchieved = targetMw * 0.9;
     const fakeCost = fakeAchieved * durationH * 40;
