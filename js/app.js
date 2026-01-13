@@ -16,12 +16,22 @@ window.addEventListener('DOMContentLoaded', async () => {
     renderGridOverview(sample);
     renderForecastView();
     initDrConsole();
-        renderHistoryView();
+    await renderHistoryView(); // Ensure it's awaited
   } catch (err) {
     console.error('App init error', err);
     const el = document.querySelector('#grid-kpis');
     if (el) {
-      el.innerHTML = '<div class="kpi-card"><div class="kpi-label">Status</div><div class="kpi-value">Demo mode</div><div class="kpi-sub">Live grid API unavailable</div></div>';
+      el.innerHTML = '<div class="kpi-card"><div class="kpi-label">Status</div><div class="kpi-value">Demo mode</div><div class="kpi-subtitle">Offline / Error</div></div>';
     }
   }
 });
+
+// Global function to allow manual history refresh from console or tests
+window.refreshHistory = async function() {
+  try {
+    await renderHistoryView();
+    console.log('✓ Event History refreshed');
+  } catch (err) {
+    console.error('Error refreshing history:', err);
+  }
+};
