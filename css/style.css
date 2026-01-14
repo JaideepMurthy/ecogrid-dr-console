@@ -75,13 +75,14 @@ body.app-body {
   display: none;
   animation: fadeIn 0.22s ease-out;
 }
-[x-show="currentView === 'grid'"],
-[x-show="currentView === 'forecast'"],
-[x-show="currentView === 'dr'"],
-[x-show="currentView === 'history'"] {
-  display: block;
+[data-view="grid"],
+[data-view="forecast"],
+[data-view="dr"],
+[data-view="history"],
+  [data-view="scenario"] {
 }
-.view-section h1 {
+.78
+h1 {
   margin: 0 0 0.75rem;
   font-size: 1.3rem;
   font-weight: 600;
