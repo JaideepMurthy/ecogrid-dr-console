@@ -62,3 +62,30 @@ window.refreshHistory = async function() {
     console.error('Error refreshing history:', err);
   }
 };
+
+// Initialize tab navigation
+document.querySelectorAll('[data-view]').forEach(button => {
+  button.addEventListener('click', (e) => {
+    e.preventDefault();
+    const viewName = button.getAttribute('data-view');
+    
+    // Remove active from all buttons
+    document.querySelectorAll('[data-view]').forEach(btn => btn.classList.remove('active'));
+    // Add active to clicked button
+    button.classList.add('active');
+    
+    // Hide all view sections
+    document.querySelectorAll('.view-section').forEach(section => {
+      section.removeAttribute('data-view');
+    });
+    
+    // Show selected view section
+    const selectedSection = document.getElementById(`view-${viewName}`);
+    if (selectedSection) {
+      selectedSection.setAttribute('data-view', viewName);
+      console.log(`✓ Switched to ${viewName} view`);
+    }
+  });
+});
+
+console.log('✓ Tab navigation initialized');
