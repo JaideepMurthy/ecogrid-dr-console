@@ -1,5 +1,5 @@
-import { createDrEvent, listDrEvents } from './db.js';
-import { renderHistoryView } from './ui-history.js';
+import { createDrEvent, listDrEvents, createAuditLog, saveAuditLog } from './db.js';
+import { renderHistoryView } from './ui-history.js'
 
 export function initDrConsole() {
   const form = document.querySelector('#dr-form');
@@ -16,7 +16,8 @@ export function initDrConsole() {
     const fakeAchieved = targetMw * 0.9;
     const fakeCost = fakeAchieved * durationH * 40;
     const fakeCo2 = fakeAchieved * durationH * 0.45;
-    const eventDoc = { createdAt: new Date().toISOString(), targetMw, achievedMw: fakeAchieved, durationH, costSavedEur: fakeCost, co2AvoidedTons: fakeCo2, startTime };
+ const operatorName = document.querySelector('#operator-name').value || 'Anonymous';
+    const eventDoc = { createdAt: new Date().toISOString(), targetMw, achievedMw: fakeAchieved, durationHdurationH, costSavedEur  , costSavedEur: fakeCost, co2AvoidedTons: fakeCo2, startTime };
     const id = await createDrEvent(eventDoc);
      renderHistoryView(); // Update Event History tab after creating event
     resultContainer.innerHTML = `
