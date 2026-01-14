@@ -236,4 +236,58 @@ body.app-body {
 @media (max-width: 720px) {
   .app-header { flex-direction: column; align-items: flex-start; gap: 0.4rem; }
   .app-main { padding-inline: 0.9rem; }
+
+  .view-section {
+  padding: 20px;
+  min-height: 500px;
+  display: block;
+  color: var(--fg);
+}
+
+.view-section h1 {
+  color: var(--accent);
+  margin-bottom: 20px;
+  font-size: 1.8rem;
+}
+
+.view-section h3 {
+  color: var(--accent-soft);
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
+.view-section p {
+  color: var(--fg);
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.view-section table {
+  width: 100%;
+  margin-top: 15px;
+  border-collapse: collapse;
+}
+
+.view-section table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+  color: var(--fg);
+}
+
+.view-section table tr:hover {
+  background: rgba(80, 250, 123, 0.05);
+}
+
+.view-section #scenario-baseline-peak,
+.view-section #scenario-with-peak,
+.view-section #scenario-peak-savings,
+.view-section #scenario-baseline-cost,
+.view-section #scenario-with-cost,
+.view-section #scenario-cost-savings,
+.view-section #scenario-baseline-co2,
+.view-section #scenario-with-co2,
+.view-section #scenario-co2-savings {
+  color: var(--accent);
+  font-weight: bold;
+}
 }
