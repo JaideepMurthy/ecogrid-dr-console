@@ -19,6 +19,7 @@
       <button id="btn-forecast" class="nav-btn" data-view="forecast">Peak Forecast</button>
       <button id="btn-dr" class="nav-btn" data-view="dr">DR Console</button>
       <button id="btn-history" class="nav-btn" data-view="history">Event History</button>
+          <button id="btn-scenario" class="nav-btn" data-view="scenario">Scenario Comparison</button>
     </nav>
   </header>
 
@@ -83,6 +84,54 @@
         <tbody></tbody>
       </table>
     </section>
+    
+  <section class="view-section hidden" id="view-scenario">
+    <h1>Scenario Comparison</h1>
+    <p class="hint-text">Compare DR event outcomes against baseline "do nothing" scenario</p>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+      <div>
+        <h3>Baseline (No DR)</h3>
+        <div id="scenario-baseline-metrics"></div>
+        <canvas id="chart-scenario-baseline" class="chart-container"></canvas>
+      </div>
+      <div>
+        <h3>With DR Event</h3>
+        <div id="scenario-with-metrics"></div>
+        <canvas id="chart-scenario-with" class="chart-container"></canvas>
+      </div>
+    </div>
+    
+    <div style="background: #f5f5f5; padding: 15px; border-radius: 4px; margin-top: 20px;">
+      <h3>Impact Summary</h3>
+      <table style="width: 100%; margin-top: 10px;">
+        <tr style="border-bottom: 1px solid #ddd;">
+          <td style="padding: 10px;"><strong>Metric</strong></td>
+          <td style="padding: 10px;"><strong>Baseline</strong></td>
+          <td style="padding: 10px;"><strong>With DR</strong></td>
+          <td style="padding: 10px;"><strong>Savings</strong></td>
+        </tr>
+        <tr style="border-bottom: 1px solid #ddd;">
+          <td style="padding: 10px;">Peak Demand (MW)</td>
+          <td style="padding: 10px;" id="scenario-baseline-peak">-</td>
+          <td style="padding: 10px;" id="scenario-with-peak">-</td>
+          <td style="padding: 10px; color: green;" id="scenario-peak-savings">-</td>
+        </tr>
+        <tr style="border-bottom: 1px solid #ddd;">
+          <td style="padding: 10px;">Cost (EUR)</td>
+          <td style="padding: 10px;" id="scenario-baseline-cost">-</td>
+          <td style="padding: 10px;" id="scenario-with-cost">-</td>
+          <td style="padding: 10px; color: green;" id="scenario-cost-savings">-</td>
+        </tr>
+        <tr>
+          <td style="padding: 10px;">CO2 Avoided (t)</td>
+          <td style="padding: 10px;" id="scenario-baseline-co2">0</td>
+          <td style="padding: 10px;" id="scenario-with-co2">-</td>
+          <td style="padding: 10px; color: green;" id="scenario-co2-savings">-</td>
+        </tr>
+      </table>
+    </div>
+  </section>
   </main>
 
   <footer class="app-footer"><span>EcoGrid DR Console - TecStorm Demo</span></footer>
