@@ -1,4 +1,6 @@
 import { initDb } from './db.js';
+import { startRealtimePolling, renderForecastView } from './api.js';
+ startRealtimePolling(async () => { await renderForecastView(); });
 import { fetchGridData } from './api.js';
 import { renderGridOverview } from './ui-grid.js';
 import { renderForecastView } from './ui-forecast.js';
