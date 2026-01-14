@@ -1,6 +1,5 @@
 import { initDb } from './db.js';
-import { startRealtimePolling, renderForecastView } from './api.js';
- startRealtimePolling(async () => { await renderForecastView(); });
+import { startRealtimePolling } from './api.js';
 import { fetchGridData } from './api.js';
 import { renderGridOverview } from './ui-grid.js';
 import { renderForecastView } from './ui-forecast.js';
@@ -11,14 +10,15 @@ window.addEventListener('DOMContentLoaded', async () => {
   try {
     await initDb();
     console.info('IndexedDB initialised');
-
     const sample = await fetchGridData();
     console.info('Sample grid data:', sample);
-
     renderGridOverview(sample);
-await renderForecastView();   
-     initDrConsole();
-    await renderHistoryView(); // Ensure it's awaited
+    await renderForecastView();
+    initDrConsole();
+    await renderHistoryView();
+    startRealtimePolling(async () => {
+      await renderForecastView();
+    });
   } catch (err) {
     console.error('App init error', err);
     const el = document.querySelector('#grid-kpis');
@@ -28,7 +28,6 @@ await renderForecastView();
   }
 });
 
-// Global function to allow manual history refresh from console or tests
 window.refreshHistory = async function() {
   try {
     await renderHistoryView();
