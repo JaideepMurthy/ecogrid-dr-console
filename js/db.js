@@ -9,6 +9,7 @@ export function initDb() {
       const db = event.target.result;
       if (!db.objectStoreNames.contains('gridCache')) db.createObjectStore('gridCache', { keyPath: 'key' });
       if (!db.objectStoreNames.contains('drEvents')) db.createObjectStore('drEvents', { keyPath: 'id', autoIncrement: true });
+       if (!db.objectStoreNames.contains('auditLogs')) db.createObjectStore('auditLogs', { keyPath: 'id', autoIncrement: true });
     };
     openReq.onsuccess = () => { dbInstance = openReq.result; resolve(); };
     openReq.onerror = () => reject(openReq.error);
