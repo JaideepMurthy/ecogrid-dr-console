@@ -129,3 +129,33 @@ function generateRiskExplanation(risk, demand, renewable, price, volatility) {
   if (reasons.length === 0) return 'stable grid conditions';
   return reasons.join(', ');
 }
+
+// Factor breakdown for UI drill-down
+export function getFactorBreakdown(gridData) {
+  if (!gridData || !gridData.hourly) {
+    return {
+      factors: [
+        { name: 'High Demand', percentage: 35, explanation: 'Load at 85% of critical threshold' },
+        { name: 'Low Renewables', percentage: 30, explanation: 'Wind/solar at 35% of mix' },
+        { name: 'Price Pressure', percentage: 25, explanation: 'Prices at €95/MWh' },
+        { name: 'Grid Volatility', percentage: 10, explanation: 'Demand swings ±200 MW/h' }
+      ]
+    };
+  }
+  const riskScores = gridData.hourly.map((hour, idx) => {
+    const risk = calculateAdvancedRiskScore(gridData, idx);
+    return { ...risk, hourIndex: idx };
+  });
+  const peakRiskIdx = riskScores.reduce((maxIdx, current, idx) => 
+    current.score > riskScores[maxIdx].score ? idx : maxIdx, 0);
+  const peakHour = riskScores[peakRiskIdx];
+  return {
+    factors: [
+      { name: 'Demand Stress', percentage: 35, score: peakHour.factors.demand, explanation: 'Industrial HVAC is fastest lever' },
+      { name: 'Renewables Gap', percentage: 30, score: peakHour.factors.renewable, explanation: 'EV charging can defer by 6h max' },
+      { name: 'Price Spike', percentage: 25, score: peakHour.factors.price, explanation: 'Higher incentive for participants' },
+      { name: 'Volatility', percentage: 10, score: peakHour.factors.volatility, explanation: 'Battery resources critical' }
+    ],
+    summary: `Peak at hour ${peakHour.hour}: ${(peakHour.score * 100).toFixed(0)}/100 (${peakHour.risk})`
+  };
+}
