@@ -288,3 +288,19 @@ export function parseGridResponse(rawJSON) {
     production: rawJSON.productionMix || {}
   };
 }
+
+
+// Real-time monitoring: 15-minute polling interval
+let pollingInterval = null;
+let lastUpdateTime = null;
+const POLLING_INTERVAL_MS = 15 * 60 * 1000;
+
+export function startRealtimePolling(onDataUpdate) {
+   if (pollingInterval) return;
+   console.log('🔄 Starting real-time monitoring');
+   pollingInterval = setInterval(async () => { await fetchGridData(); lastUpdateTime = new Date(); if (onDataUpdate) onDataUpdate(); }, POLLING_INTERVAL_MS);
+  }
+
+export function stopRealtimePolling() { if (pollingInterval) { clearInterval(pollingInterval); pollingInterval = null; } }
+
+export function getLastUpdateTime() { return lastUpdateTime; }
