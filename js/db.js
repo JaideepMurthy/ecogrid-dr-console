@@ -108,5 +108,25 @@ export function getAuditTrail(eventId) {
     };
     req.onerror = () => reject(req.error);
   });
+// Export events with audit trail for compliance
+export async function exportEventsWithAuditTrail() {
+ const events = await listDrEvents();
+ const auditLogs = await new Promise((resolve, reject) => {
+ const store = getStore('auditLogs', 'readonly');
+ const req = store.getAll();
+ req.onsuccess = () => resolve(req.result || []);
+ req.onerror = () => reject(req.error);
+ });
+
+ let csv = 'Event ID,Created At,Operator Name,Target MW,Achieved MW,Duration Hours,Cost Saved EUR,CO2 Avoided Tons,Audit Log\n';
+ 
+ events.forEach(event => {
+ const eventAuditLogs = auditLogs.filter(log => log.eventId === event.id);
+ const auditSummary = eventAuditLogs.map(log => `${log.action}:${log.operatorName}@${log.timestamp}[${log.hash}]`).join(';');
+ csv += `${event.id},"${event.createdAt}","${event.operatorName || 'Unknown'}",${event.targetMw},${event.achievedMw},${event.durationH},${event.costSavedEur.toFixed(2)},${event.co2AvoidedTons.toFixed(2)},"${auditSummary}"\n`;
+ });
+ 
+ return csv;
+}
 }
 }
