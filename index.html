@@ -111,6 +111,29 @@
       alert(html.replace(/<[^>]*>/g, ''));
     });
   }
+    // Export compliance report with audit trail
+ const btnExportAudit = document.getElementById('btn-export-audit');
+ if (btnExportAudit) {
+ btnExportAudit.addEventListener('click', async () => {
+ try {
+ const { exportEventsWithAuditTrail } = await import('./js/db.js');
+ const csv = await exportEventsWithAuditTrail();
+ const blob = new Blob([csv], { type: 'text/csv' });
+ const url = window.URL.createObjectURL(blob);
+ const a = document.createElement('a');
+ a.href = url;
+ a.download = `compliance-report-${new Date().toISOString().split('T')[0]}.csv`;
+ document.body.appendChild(a);
+ a.click();
+ window.URL.revokeObjectURL(url);
+ a.remove();
+ alert('Compliance report exported successfully!');
+ } catch (e) {
+ console.error('Export failed:', e);
+ alert('Export failed: ' + e.message);
+ }
+ });
+ }
 </script>
 </body>
 </html>
