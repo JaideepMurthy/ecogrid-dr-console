@@ -136,74 +136,12 @@ id="grid-kpis"        " class="kpi-row"></div>
 
   <footer class="app-footer"><span>EcoGrid DR Console - TecStorm Demo</span></footer>
 
-  <script type="module" src="js/app.js"></script>
-  <script>
-    // Vanilla JS navigation (no Alpine dependency)
+  <script type="module">
+    import { initApp } from './js/app.js';
+    
     document.addEventListener('DOMContentLoaded', () => {
-      const navButtons = document.querySelectorAll('.nav-btn');
-      const sections = document.querySelectorAll('.view-section');
-
-      navButtons.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          const viewName = e.target.dataset.view;
-          console.log('Navigating to:', viewName);
-          
-          // Hide all sections
-          sections.forEach(s => s.classList.add('hidden'));
-          navButtons.forEach(b => b.classList.remove('active'));
-          
-          // Show selected section
-          document.getElementById('view-' + viewName)?.classList.remove('hidden');
-          e.target.classList.add('active');
-        });
-      });
-
-      // Ramp display handler
-      document.getElementById('dr-ramp-min')?.addEventListener('input', (e) => {
-        document.getElementById('ramp-display').textContent = e.target.value + ' min';
-      });
-
-      // Factor drill-down
-      const btnDrillDown = document.getElementById('btn-drill-down');
-      if (btnDrillDown) {
-        btnDrillDown.addEventListener('click', () => {
-          const factors = {
-            'High Demand': '73%',
-            'Low Renewables': '12%',
-            'Price Spike': '11%',
-            'Grid Volatility': '4%'
-          };
-          let msg = '📊 Risk Factor Breakdown\n\n';
-          for (const [factor, weight] of Object.entries(factors)) {
-            msg += `${factor}: ${weight}\n`;
-          }
-          alert(msg);
-        });
-      }
-
-      // Export compliance report
-      const btnExportAudit = document.getElementById('btn-export-audit');
-      if (btnExportAudit) {
-        btnExportAudit.addEventListener('click', async () => {
-          try {
-            const { exportEventsWithAuditTrail } = await import('./js/db.js');
-            const csv = await exportEventsWithAuditTrail();
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `compliance-report-${new Date().toISOString().split('T')[0]}.csv`;
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            a.remove();
-            alert('Compliance report exported successfully!');
-          } catch (e) {
-            console.error('Export failed:', e);
-            alert('Export failed: ' + e.message);
-          }
-        });
-      }
+      console.log('🚀 DOM Content Loaded - initializing EcoGrid...');
+      initApp();
     });
   </script>
 </body>
