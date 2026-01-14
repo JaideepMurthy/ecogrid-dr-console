@@ -37,7 +37,8 @@ window.addEventListener('DOMContentLoaded', async () => {
       await renderForecastView();
     });
     
-    console.log('✓ APP INITIALIZED SUCCESSFULLY');
+    console.log('✓ 40
+                ');
   } catch (err) {
     console.error('✗ App init error:', err);
     console.error('Stack:', err.stack);
@@ -89,3 +90,7 @@ document.querySelectorAll('[data-view]').forEach(button => {
 });
 
 console.log('✓ Tab navigation initialized');
+
+// Initialize with grid view visible
+const gridButton = document.querySelector('[data-view="grid"]');
+if (gridButton) gridButton.click();
