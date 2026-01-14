@@ -4,12 +4,14 @@ import { renderGridOverview } from './ui-grid.js';
 import { renderForecastView } from './ui-forecast.js';
 import { initDrConsole } from './ui-events.js';
 import { renderHistoryView } from './ui-history.js';
+import { initIntegration } from './ui-integration.js';
 
 window.addEventListener('DOMContentLoaded', async () => {
   console.log('APP: DOMContentLoaded fired');
   
   try {
     console.log('APP: Initializing DB...');
+        initIntegration();
     await initDb();
     console.info('✓ IndexedDB initialised');
     
