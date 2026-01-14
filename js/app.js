@@ -6,7 +6,8 @@ import { initDrConsole } from './ui-events.js';
 import { renderHistoryView } from './ui-history.js';
 import { initIntegration } from './ui-integration.js';
 
-window.addEventListener('DOMContentLoaded', async () => {
+export async function initApp() {
+
   console.log('APP: DOMContentLoaded fired');
   
   try {
@@ -85,9 +86,7 @@ document.querySelectorAll('[data-view]').forEach(button => {
     if (selectedSection) {
       selectedSection.setAttribute('data-view', viewName);
       console.log(`✓ Switched to ${viewName} view`);
-    }
-  });
-});
+    }  }
 
 console.log('✓ Tab navigation initialized');
 
