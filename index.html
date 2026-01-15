@@ -38,6 +38,7 @@ id="grid-kpis"        " class="kpi-row"></div>
       <button id="btn-refresh-grid" class="primary-btn">Refresh data</button>
       <p class="hint-text">Uses public Portugal electricity data, cached locally for fast demos.</p>
     </section>
+       <div id="debug-console" style="background: #222; color: #0f0; padding: 20px; margin: 20px; font-family: monospace; font-size: 12px; white-space: pre-wrap; max-height: 300px; overflow: auto; border: 1px solid #0f0;">Debug Console: Loading...</div>
 
     <section class="view-section hidden" id="view-forecast">
       <h1>Peak Risk Forecast</h1>
@@ -144,6 +145,26 @@ id="grid-kpis"        " class="kpi-row"></div>
     document.addEventListener('DOMContentLoaded', () => {
       console.log('🚀 DOM Content Loaded - initializing EcoGrid...');
       initApp();
+      
+window.debugLog = [];
+const originalLog = console.log;
+const originalError = console.error;
+console.log = function(...args) {
+  originalLog(...args);
+  const debugEl = document.getElementById('debug-console');
+  if (debugEl) {
+    debugEl.textContent += '\n[LOG] ' + args.join(' ');
+    debugEl.scrollTop = debugEl.scrollHeight;
+  }
+};
+console.error = function(...args) {
+  originalError(...args);
+  const debugEl = document.getElementById('debug-console');
+  if (debugEl) {
+    debugEl.textContent += '\n[ERROR] ' + args.join(' ');
+    debugEl.scrollTop = debugEl.scrollHeight;
+  }
+};
     });
   </script>
 </body>
