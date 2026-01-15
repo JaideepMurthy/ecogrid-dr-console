@@ -12,6 +12,15 @@
   --shadow-soft: 0 12px 35px rgba(0, 0, 0, 0.45);
   --font-main: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", sans-serif;
 }
+
+.hidden {
+  display: none !important;
+}
+
+.view-section {
+  padding: 20px;
+  margin-bottom: 20px;
+}
 * { box-sizing: border-box; }
 body.app-body {
   margin: 0;
