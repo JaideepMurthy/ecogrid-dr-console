@@ -92,7 +92,7 @@ main {
   margin: 0 auto;
 }
 .view-section {
-  display: none;
+  display: block;
   animation: fadeIn 0.22s ease-out;
 }
 [data-view="grid"],
