@@ -47,6 +47,13 @@ body.app-body {
   top: 0;
   z-index: 50;
 }
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
 .app-title {
   font-weight: 600;
   letter-spacing: 0.04em;
