@@ -21,6 +21,9 @@
     display: block;
   padding: 20px;
   margin-bottom: 20px;
+    width: 100%;
+  min-height: auto;
+  overflow: auto;
 }
 * { box-sizing: border-box; }
 body.app-body {
