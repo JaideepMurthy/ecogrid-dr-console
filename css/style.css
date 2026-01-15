@@ -18,6 +18,7 @@
 }
 
 .view-section {
+    display: block;
   padding: 20px;
   margin-bottom: 20px;
 }
