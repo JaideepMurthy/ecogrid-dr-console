@@ -78,14 +78,13 @@ document.querySelectorAll('[data-view]').forEach(button => {
     
     // Hide all view sections
     document.querySelectorAll('.view-section').forEach(section => {
-      section.removeAttribute('data-view');
-    });
-    
+      section.classList.add('hidden');
+    })    
     // Show selected view section
     const selectedSection = document.getElementById(`view-${viewName}`);
     if (selectedSection) {
-      selectedSection.setAttribute('data-view', viewName);
-      console.log(`✓ Switched to ${viewName} view`);
+    selectedSection.classList.remove('hidden');
+          console.log('✓ Switched to ${viewName} view');
     }  }
 
 console.log('✓ Tab navigation initialized');
