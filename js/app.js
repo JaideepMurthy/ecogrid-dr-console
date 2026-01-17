@@ -54,6 +54,37 @@ export async function initApp() {
       </div>`;
     }
   }
+
+    // Initialize tab navigation
+  document.querySelectorAll('[data-view]').forEach(button => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      const viewName = button.getAttribute('data-view');
+      
+      // Remove active from all buttons
+      document.querySelectorAll('[data-view]').forEach(btn => btn.classList.remove('active'));
+      // Add active to clicked button
+      button.classList.add('active');
+      
+      // Hide all view sections
+      document.querySelectorAll('.view-section').forEach(section => {
+        section.classList.add('hidden');
+      });
+      
+      // Show selected view section
+      const selectedSection = document.getElementById(`view-${viewName}`);
+      if (selectedSection) {
+        selectedSection.classList.remove('hidden');
+        console.log(`✓ Switched to ${viewName} view`);
+      }
+    });
+  });
+  
+  console.log('✓ Tab navigation initialized');
+  
+  // Initialize with grid view visible
+  const gridButton = document.querySelector('[data-view="grid"]');
+  if (gridButton) gridButton.click();
 });
 
 window.refreshHistory = async function() {
@@ -65,30 +96,4 @@ window.refreshHistory = async function() {
   }
 };
 
-// Initialize tab navigation
-document.querySelectorAll('[data-view]').forEach(button => {
-  button.addEventListener('click', (e) => {
-    e.preventDefault();
-    const viewName = button.getAttribute('data-view');
-    
-    // Remove active from all buttons
-    document.querySelectorAll('[data-view]').forEach(btn => btn.classList.remove('active'));
-    // Add active to clicked button
-    button.classList.add('active');
-    
-    // Hide all view sections
-    document.querySelectorAll('.view-section').forEach(section => {
-      section.classList.add('hidden');
-    })    
-    // Show selected view section
-    const selectedSection = document.getElementById(`view-${viewName}`);
-    if (selectedSection) {
-    selectedSection.classList.remove('hidden');
-          console.log('✓ Switched to ${viewName} view');
-    }  }
-
-console.log('✓ Tab navigation initialized');
-
-// Initialize with grid view visible
-const gridButton = document.querySelector('[data-view="grid"]');
 if (gridButton) gridButton.click();
